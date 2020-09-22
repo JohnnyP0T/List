@@ -1,0 +1,2 @@
+C:\Users\arrog\source\repos\SDlab22\Debug\SDlab22.exe
+C:\Users\arrog\source\repos\SDlab22\Debug\SDlab22.pdb
