@@ -106,7 +106,6 @@ inline void List<T>::PushBack(T data)
 	{
 		_tail = new Node<T>(data, _head);
 		_head->pointNext = _tail;
-		//_tail->pointPrev = _head;
 	}
 	else
 	{
@@ -140,16 +139,32 @@ template<typename T>
 inline T& List<T>::operator[](const int index)
 {
 	int counter = 0;
-	Node<T>* current = this->_head;
-	while (current != nullptr)
+	Node<T>* current;
+	if (index <= (_size / 2))
+	{
+		current = this->_head;
+		while (counter <= (_size / 2))
+		{
+			if (counter == index)
+			{
+				return current->data;
+			}
+			current = current->pointNext;
+			counter++;
+		}
+	}
+	counter = _size - 1;
+	current = this->_tail;
+	while (counter > (_size / 2))
 	{
 		if (counter == index)
 		{
 			return current->data;
 		}
-		current = current->pointNext;
-		counter++;
+		current = current->pointPrev;
+		counter--;
 	}
+	
 }
 
 
