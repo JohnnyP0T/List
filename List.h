@@ -29,9 +29,14 @@ public:
 	T& operator[](const int index);
 
 
-	//void PushFront(T data);
-	//void Insert(T data, int index);
-	//void RemoveAt(int index);
+	void PushFront(T data);
+	/// @brief вставка элемента по индексу
+	/// @param data значение
+	/// @param index индекс
+	void Insert(T data, int index);
+	/// @brief удаление по индексу
+	/// @param index индекс
+	void RemoveAt(int index);
 	void PopBack();
 	
 
@@ -120,6 +125,7 @@ inline void List<T>::PushBack(T data)
 template<typename T>
 inline void List<T>::Clear()
 {
+	//удаляем с конца и с начала
 	for (_size; _size > 0;)
 	{
 		PopFront();
@@ -140,6 +146,7 @@ inline T& List<T>::operator[](const int index)
 {
 	int counter = 0;
 	Node<T>* current;
+	//проверяем от куда быстрее найти нужный элемент
 	if (index <= (_size / 2))
 	{
 		current = this->_head;
@@ -165,6 +172,114 @@ inline T& List<T>::operator[](const int index)
 		counter--;
 	}
 	
+}
+
+
+template<typename T>
+inline void List<T>::PushFront(T data)
+{
+	if (_head == nullptr)
+	{
+		_head = new Node<T>(data);
+	}
+	else if (_tail == nullptr)
+	{
+		_tail = new Node<T>(_head->data, _head);
+		_head->pointNext = _tail;
+		_head->data = data;
+	}
+	else
+	{
+		Node<T>* current = _head;
+		_head = new Node<T>(data, nullptr, current);
+		current->pointPrev = _head;
+	}
+	++_size;
+}
+
+
+template<typename T>
+inline void List<T>::Insert(T data, int index)
+{
+	if (index == 0)
+	{
+		PushFront(data);
+	}
+	else if (index == _size)
+	{
+		PushBack(data);
+	}
+	else
+	{
+		Node<T>* previous;
+		if (index <= (_size / 2))
+		{
+			previous = this->_head;
+			for (int i = 0; i < index - 1; i++)
+			{
+				previous = previous->pointNext;
+			}
+			previous->pointNext = new Node<T>(data, previous, previous->pointNext);
+			//у следующего элемента после нового надо установить пердыдущий указатель
+			previous = previous->pointNext;
+			previous->pointNext->pointPrev = previous;
+		}
+		else
+		{
+			previous = this->_tail;
+			for (int i = _size; i > index + 1; i--)
+			{
+				previous = previous->pointPrev;
+			}
+			previous->pointPrev = new Node<T>(data, previous->pointPrev, previous);
+			previous = previous->pointPrev;
+			previous->pointPrev->pointNext = previous;
+		}
+		++_size;
+	}
+}
+
+
+template<typename T>
+inline void List<T>::RemoveAt(int index)
+{
+	if (index == 0)
+	{
+		PopFront();
+	}
+	else if (index == _size)
+	{
+		PopBack();
+	}
+	else
+	{
+		Node<T>* previous;
+		if (index <= (_size / 2))
+		{
+			previous = this->_head;
+			for (int i = 0; i < index - 1; i++)
+			{
+				previous = previous->pointNext;
+			}
+			Node<T>* toDelete = previous->pointNext;
+			previous->pointNext = toDelete->pointNext;
+			toDelete->pointNext->pointPrev = previous;
+			delete toDelete;
+		}
+		else
+		{
+			previous = this->_tail;
+			for (int i = _size; i > index + 1; i--)
+			{
+				previous = previous->pointPrev;
+			}
+			Node<T>* toDelete = previous->pointPrev;
+			previous->pointPrev = toDelete->pointPrev;
+			toDelete->pointPrev->pointNext = previous;
+			delete toDelete;
+		}
+		--_size;
+	}
 }
 
 

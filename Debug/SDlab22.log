@@ -1,3 +1,5 @@
-﻿  Main.cpp
-C:\Users\arrog\source\repos\SDlab22\List.h(169): warning C4715: List<int>::operator[]: значение возвращается не при всех путях выполнения
+﻿  List.cpp
+  Main.cpp
+  Создание кода...
+C:\Users\arrog\source\repos\SDlab22\List.h(175): warning C4715: List<int>::operator[]: значение возвращается не при всех путях выполнения
   SDlab22.vcxproj -> C:\Users\arrog\source\repos\SDlab22\Debug\SDlab22.exe

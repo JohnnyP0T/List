@@ -5,21 +5,27 @@ using namespace std;
 int main()
 {
 	List<int> list;
-	list.PushBack(1);
-	list.PushBack(2);
-	list.PushBack(3);
-	list.PushBack(4);
-	list.PushBack(5);
-
+	list.PushFront(1);
+	list.PushFront(2);
+	list.PushFront(3);
+	list.PushFront(4);
+	list.PushFront(1023);
+	list.PushBack(6);
+	list.PushBack(7);
+	list.Insert(9, 3);
+	cout << endl;
+	cout << list.GetSize();
+	cout << endl;
+	for (int i = 0; i < list.GetSize(); i++)
+	{
+		cout << list[i];
+	}
+	list.RemoveAt(3);
 	cout << endl;
 	for (int i = 0; i < list.GetSize(); i++)
 	{
 		cout << list[i];
 	}
 	
-	//cout << endl;
-//	for (int i = list.GetSize(); i > 0; i--)
-	//{
-//			cout << "prev "<< list._tail->data << endl;
-	//}
+
 }
