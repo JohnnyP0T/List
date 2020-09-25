@@ -10,7 +10,8 @@ int main()
 	list.PushFront(3);
 	list.PushFront(4);
 	list.PushFront(1023);
-	list.PushBack(6);
+	list.PushBack(8); 
+
 	list.PushBack(7);
 	list.Insert(9, 3);
 	cout << endl;
