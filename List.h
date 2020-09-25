@@ -5,6 +5,7 @@ using namespace std;
 template<typename T>
 class List
 {
+
 public:
 	List();
 	~List();
@@ -41,6 +42,7 @@ public:
 	
 
 private:
+	
 	template<typename T>
 	class Node
 	{
@@ -52,11 +54,83 @@ private:
 			data(data), pointPrev(pointPrev), pointNext(pointNext) {}
 	};
 
+	//template<typename T>
+	template<typename Node, typename T>
+	class ListIterator
+	{
+		//friend class Node;
+		//friend class List;
+	private:
+		Node* value;
+	public:
+		ListIterator() : value(nullptr) {}
+		ListIterator(Node* value) : value(value) {}
+
+
+		/*bool operator!=(const ListIterator const& other) const
+		{
+			return value != other.value;
+		}*/
+		bool operator != (const Node* _value) const
+		{
+			return (value != _value);
+		}
+
+		ListIterator& operator++()
+		{
+			if (value != nullptr)
+			{
+				value = value->pointNext;
+			}
+			return *this;
+		}
+
+
+		T& operator*()
+		{
+			return value->data;
+		}
+
+
+		ListIterator& operator++(int)
+		{
+			ListIterator it(*this);
+			++* this;
+			return it;
+		}
+
+
+		/*friend std::ostream& operator<<(std::ostream& os, const Node<T>& n)
+		{
+			return os << n.value;
+		}*/
+	};
 
 private:
 	int _size;
 	Node<T>* _head;
 	Node<T>* _tail;
+
+public:
+	typedef ListIterator<Node<T>, T> iterator;
+	typedef ListIterator<const Node<T>, const T> const_iterator;
+	Node<T>* begin()
+	{
+		return _head;
+	}
+	Node<T>* end()
+	{
+		return nullptr;
+	}
+
+	Node<T>* begin() const
+	{
+		return _head;
+	}
+	Node<T>* end() const
+	{
+		return nullptr;
+	}
 };
 
 
@@ -304,5 +378,7 @@ inline void List<T>::PopBack()
 	delete temp;
 	--_size;
 }
+
+
 
 
