@@ -10,13 +10,17 @@ public:
 	List();
 	~List();
 
-
 	void PopFront();
+	void PopBack();
 
 	/// @brief добавление элемента в конец
 	/// @param data значение
 	void PushBack(T data);
+	/// @brief добавление элемента с начала
+	/// @param data значение
+	void PushFront(T data);
 
+	void Sort();
 
 	void Clear();
 
@@ -29,18 +33,15 @@ public:
 	/// @return значение
 	T& operator[](const int index);
 
-
-	void PushFront(T data);
 	/// @brief вставка элемента по индексу
 	/// @param data значение
 	/// @param index индекс
 	void Insert(T data, int index);
+
 	/// @brief удаление по индексу
 	/// @param index индекс
 	void RemoveAt(int index);
-	void PopBack();
 	
-
 private:
 	
 	template<typename T>
@@ -54,12 +55,9 @@ private:
 			data(data), pointPrev(pointPrev), pointNext(pointNext) {}
 	};
 
-	//template<typename T>
 	template<typename Node, typename T>
 	class ListIterator
 	{
-		//friend class Node;
-		//friend class List;
 	private:
 		Node* value;
 	public:
@@ -67,14 +65,11 @@ private:
 		ListIterator(Node* value) : value(value) {}
 
 
-		/*bool operator!=(const ListIterator const& other) const
-		{
-			return value != other.value;
-		}*/
 		bool operator != (const Node* _value) const
 		{
 			return (value != _value);
 		}
+
 
 		ListIterator& operator++()
 		{
@@ -98,12 +93,6 @@ private:
 			++* this;
 			return it;
 		}
-
-
-		/*friend std::ostream& operator<<(std::ostream& os, const Node<T>& n)
-		{
-			return os << n.value;
-		}*/
 	};
 
 private:
@@ -114,23 +103,89 @@ private:
 public:
 	typedef ListIterator<Node<T>, T> iterator;
 	typedef ListIterator<const Node<T>, const T> const_iterator;
+
+
 	Node<T>* begin()
 	{
 		return _head;
 	}
+
+
 	Node<T>* end()
 	{
 		return nullptr;
 	}
 
+
 	Node<T>* begin() const
 	{
 		return _head;
 	}
+
+
 	Node<T>* end() const
 	{
 		return nullptr;
 	}
+
+private:
+	Node<T>* MergeSortedLists(Node<T>* head1, Node<T>* head2)
+	{
+		Node<T>* result = NULL;
+		if (head1 == NULL) {
+			return head2;
+		}
+		if (head2 == NULL) {
+			return head1;
+		}
+		if (head1->data < head2->data) {
+			head1->pointNext = MergeSortedLists(head1->pointNext, head2);
+			head1->pointNext->pointPrev = head1;
+			head1->pointPrev = NULL;
+			return head1;
+		}
+		else {
+			head2->pointNext = MergeSortedLists(head1, head2->pointNext);
+			head2->pointNext->pointPrev = head2;
+			head2->pointPrev = NULL;
+			return head2;
+		}
+	}
+
+
+	void SplitList(Node<T>* src, Node<T>** fRef, Node<T>** bRef) {
+		Node<T>* fast;
+		Node<T>* slow;
+		slow = src;
+		fast = src->pointNext;
+		while (fast != NULL) {
+			fast = fast->pointNext;
+			if (fast != NULL) {
+				slow = slow->pointNext;
+				fast = fast->pointNext;
+			}
+		}
+		*fRef = src;
+		*bRef = slow->pointNext;
+		slow->pointNext = NULL;
+	}
+
+
+	void MergeSort(Node<T>** head) {
+		Node<T>* p = *head;
+		Node<T>* a = NULL;
+		Node<T>* b = NULL;
+		if (p == NULL || p->pointNext == NULL) {
+			return;
+		}
+		SplitList(p, &a, &b);
+		MergeSort(&a);
+		MergeSort(&b);
+		*head = MergeSortedLists(a, b);
+		while (_tail->pointNext)
+			_tail = _tail->pointNext;
+	}
+
 };
 
 
@@ -269,6 +324,13 @@ inline void List<T>::PushFront(T data)
 		current->pointPrev = _head;
 	}
 	++_size;
+}
+
+
+template<typename T>
+inline void List<T>::Sort()
+{
+	MergeSort(&_head);
 }
 
 

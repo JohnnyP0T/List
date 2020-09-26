@@ -23,7 +23,13 @@ int main()
 		++io;
 	}
 
-
+	list.Sort();
+	cout << endl;
+	io = list.begin();
+	while (io != list.end()) {
+		cout << *io << ' ';
+		++io;
+	}
 	//for (int i = 0; i < list.GetSize(); i++)
 	//{
 	//	cout << list[i];
