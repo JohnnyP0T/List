@@ -1,12 +1,17 @@
 #pragma once
 
 #include <iostream>
-using namespace std;
+#include <exception>
+
+
 template<typename T>
 class List
 {
 
 public:
+	template<class T>
+	class ListIterator;
+
 	List();
 	~List();
 
@@ -24,26 +29,25 @@ public:
 
 	void Clear();
 
+	/// @brief линейный поиск
+	/// @param data значение
+	/// @return значение если такое есть
+	ListIterator<T> LinearSearch(T data);
+
 	/// @brief получение размера списка
 	/// @return размер списка
 	int GetSize();
 
-	/// @brief перегрузка оператора индексирования 
-	/// @param index индекс
-	/// @return значение
-	T& operator[](const int index);
-
 	/// @brief вставка элемента по индексу
 	/// @param data значение
-	/// @param index индекс
-	void Insert(T data, int index);
+	/// @param index итератор
+	void Insert(T data, ListIterator<T> iter);
 
 	/// @brief удаление по индексу
-	/// @param index индекс
-	void RemoveAt(int index);
+	/// @param index итератор
+	void RemoveAt(ListIterator<T> iter);
 	
 private:
-	
 	template<typename T>
 	class Node
 	{
@@ -55,19 +59,27 @@ private:
 			data(data), pointPrev(pointPrev), pointNext(pointNext) {}
 	};
 
-	template<typename Node, typename T>
+	template<typename T>
 	class ListIterator
 	{
 	private:
-		Node* value;
+		Node<T>* value;
 	public:
+		friend class Node<T>;
+		friend class List<T>;
 		ListIterator() : value(nullptr) {}
-		ListIterator(Node* value) : value(value) {}
+		ListIterator(Node<T>* value) : value(value) {}
 
 
-		bool operator != (const Node* _value) const
+		bool operator == (const ListIterator it) const
 		{
-			return (value != _value);
+			return(value == it.value);
+		}
+
+
+		bool operator != (const ListIterator it) const
+		{
+			return (value != it.value);
 		}
 
 
@@ -87,10 +99,20 @@ private:
 		}
 
 
+		ListIterator& operator--()
+		{
+			if (value != nullptr)
+			{
+				value = value->pointPrev;
+			}
+			return *this;
+		}
+
+
 		ListIterator& operator++(int)
 		{
 			ListIterator it(*this);
-			++* this;
+			++(*this);
 			return it;
 		}
 	};
@@ -100,92 +122,98 @@ private:
 	Node<T>* _head;
 	Node<T>* _tail;
 
-public:
-	typedef ListIterator<Node<T>, T> iterator;
-	typedef ListIterator<const Node<T>, const T> const_iterator;
-
-
-	Node<T>* begin()
-	{
-		return _head;
-	}
-
-
-	Node<T>* end()
-	{
-		return nullptr;
-	}
-
-
-	Node<T>* begin() const
-	{
-		return _head;
-	}
-
-
-	Node<T>* end() const
-	{
-		return nullptr;
-	}
-
 private:
-	Node<T>* MergeSortedLists(Node<T>* head1, Node<T>* head2)
-	{
-		Node<T>* result = NULL;
-		if (head1 == NULL) {
-			return head2;
-		}
-		if (head2 == NULL) {
-			return head1;
-		}
-		if (head1->data < head2->data) {
-			head1->pointNext = MergeSortedLists(head1->pointNext, head2);
-			head1->pointNext->pointPrev = head1;
-			head1->pointPrev = NULL;
-			return head1;
-		}
-		else {
-			head2->pointNext = MergeSortedLists(head1, head2->pointNext);
-			head2->pointNext->pointPrev = head2;
-			head2->pointPrev = NULL;
-			return head2;
-		}
-	}
-
-
-	void SplitList(Node<T>* src, Node<T>** fRef, Node<T>** bRef) {
-		Node<T>* fast;
-		Node<T>* slow;
-		slow = src;
-		fast = src->pointNext;
-		while (fast != NULL) {
-			fast = fast->pointNext;
-			if (fast != NULL) {
-				slow = slow->pointNext;
-				fast = fast->pointNext;
+		Node<T>* MergeSortedLists(Node<T>* head1, Node<T>* head2)
+		{
+			Node<T>* result = NULL;
+			if (head1 == NULL) 
+			{
+				return head2;
+			}
+			if (head2 == NULL) 
+			{
+				return head1;
+			}
+			if (head1->data < head2->data) 
+			{
+				head1->pointNext = MergeSortedLists(head1->pointNext, head2);
+				head1->pointNext->pointPrev = head1;
+				head1->pointPrev = NULL;
+				return head1;
+			}
+			else 
+			{
+				head2->pointNext = MergeSortedLists(head1, head2->pointNext);
+				head2->pointNext->pointPrev = head2;
+				head2->pointPrev = NULL;
+				return head2;
 			}
 		}
-		*fRef = src;
-		*bRef = slow->pointNext;
-		slow->pointNext = NULL;
-	}
 
 
-	void MergeSort(Node<T>** head) {
-		Node<T>* p = *head;
-		Node<T>* a = NULL;
-		Node<T>* b = NULL;
-		if (p == NULL || p->pointNext == NULL) {
-			return;
+		void SplitList(Node<T>* src, Node<T>** fRef, Node<T>** bRef) 
+		{
+			Node<T>* fast;
+			Node<T>* slow;
+			slow = src;
+			fast = src->pointNext;
+			while (fast != NULL) 
+			{
+				fast = fast->pointNext;
+				if (fast != NULL) 
+				{
+					slow = slow->pointNext;
+					fast = fast->pointNext;
+				}
+			}
+			*fRef = src;
+			*bRef = slow->pointNext;
+			slow->pointNext = NULL;
 		}
-		SplitList(p, &a, &b);
-		MergeSort(&a);
-		MergeSort(&b);
-		*head = MergeSortedLists(a, b);
-		while (_tail->pointNext)
-			_tail = _tail->pointNext;
+
+
+		void MergeSort(Node<T>** head) 
+		{
+			Node<T>* p = *head;
+			Node<T>* a = NULL;
+			Node<T>* b = NULL;
+			if (p == NULL || p->pointNext == NULL) 
+			{
+				return;
+			}
+			SplitList(p, &a, &b);
+			MergeSort(&a);
+			MergeSort(&b);
+			*head = MergeSortedLists(a, b);
+			//возврат головы на место
+			while (_tail->pointNext)
+				_tail = _tail->pointNext;
+		}
+
+public:
+	
+	ListIterator<T> begin()
+	{
+		return ListIterator<T>(_head);
 	}
 
+	ListIterator<T> end()
+	{
+		return ListIterator<T>();
+	}
+
+	ListIterator<const T> begin() const
+	{
+		return ListIterator<T>(_head);
+	}
+
+	ListIterator<const T> end() const
+	{
+		return ListIterator<T>();
+	}
+
+	typedef ListIterator<Node<T>> iterator;
+	typedef ListIterator<const Node<T>> const_iterator;
 };
 
 
@@ -211,7 +239,7 @@ inline void List<T>::PopFront()
 {
 	if (_size == 0)
 	{
-		return;
+		throw std::exception("List is empty");
 	}
 	Node<T>* temp = _head;
 	_head = _head->pointNext;
@@ -254,6 +282,10 @@ inline void List<T>::PushBack(T data)
 template<typename T>
 inline void List<T>::Clear()
 {
+	if (_size == 0)
+	{
+		throw std::exception("List is empty");
+	}
 	//удаляем с конца и с начала
 	for (_size; _size > 0;)
 	{
@@ -264,43 +296,28 @@ inline void List<T>::Clear()
 
 
 template<typename T>
-inline int List<T>::GetSize()
+inline List<T>::ListIterator<T> List<T>::LinearSearch(T data)
 {
-	return _size;
+	if (_size == 0)
+	{
+		throw std::exception("List is empty");
+	}
+	for (auto i = this->begin(); i != this->end(); ++i)
+	{
+		if ((*i) == data)
+		{
+			return i;
+		}
+	}
+	
+	return ListIterator<T>(nullptr);
 }
 
 
 template<typename T>
-inline T& List<T>::operator[](const int index)
+inline int List<T>::GetSize()
 {
-	int counter = 0;
-	Node<T>* current;
-	//проверяем от куда быстрее найти нужный элемент
-	if (index <= (_size / 2))
-	{
-		current = this->_head;
-		while (counter <= (_size / 2))
-		{
-			if (counter == index)
-			{
-				return current->data;
-			}
-			current = current->pointNext;
-			counter++;
-		}
-	}
-	counter = _size - 1;
-	current = this->_tail;
-	while (counter > (_size / 2))
-	{
-		if (counter == index)
-		{
-			return current->data;
-		}
-		current = current->pointPrev;
-		counter--;
-	}
-	
+	return _size;
 }
 
 
@@ -335,87 +352,26 @@ inline void List<T>::Sort()
 
 
 template<typename T>
-inline void List<T>::Insert(T data, int index)
+inline void List<T>::Insert(T data, ListIterator<T> iter)
 {
-	if (index == 0)
-	{
-		PushFront(data);
-	}
-	else if (index == _size)
-	{
-		PushBack(data);
-	}
-	else
-	{
-		Node<T>* previous;
-		if (index <= (_size / 2))
-		{
-			previous = this->_head;
-			for (int i = 0; i < index - 1; i++)
-			{
-				previous = previous->pointNext;
-			}
-			previous->pointNext = new Node<T>(data, previous, previous->pointNext);
-			//у следующего элемента после нового надо установить пердыдущий указатель
-			previous = previous->pointNext;
-			previous->pointNext->pointPrev = previous;
-		}
-		else
-		{
-			previous = this->_tail;
-			for (int i = _size; i > index + 1; i--)
-			{
-				previous = previous->pointPrev;
-			}
-			previous->pointPrev = new Node<T>(data, previous->pointPrev, previous);
-			previous = previous->pointPrev;
-			previous->pointPrev->pointNext = previous;
-		}
-		++_size;
-	}
+	Node<T>* previous = iter.value;
+	previous->pointNext = new Node<T>(data, previous, previous->pointNext);
+	//у следующего элемента после нового надо установить предыдущий указатель
+	previous = previous->pointNext;
+	previous->pointNext->pointPrev = previous;
+	_size++;
 }
 
 
 template<typename T>
-inline void List<T>::RemoveAt(int index)
+inline void List<T>::RemoveAt(ListIterator<T> iter)
 {
-	if (index == 0)
-	{
-		PopFront();
-	}
-	else if (index == _size)
-	{
-		PopBack();
-	}
-	else
-	{
-		Node<T>* previous;
-		if (index <= (_size / 2))
-		{
-			previous = this->_head;
-			for (int i = 0; i < index - 1; i++)
-			{
-				previous = previous->pointNext;
-			}
-			Node<T>* toDelete = previous->pointNext;
-			previous->pointNext = toDelete->pointNext;
-			toDelete->pointNext->pointPrev = previous;
-			delete toDelete;
-		}
-		else
-		{
-			previous = this->_tail;
-			for (int i = _size; i > index + 1; i--)
-			{
-				previous = previous->pointPrev;
-			}
-			Node<T>* toDelete = previous->pointPrev;
-			previous->pointPrev = toDelete->pointPrev;
-			toDelete->pointPrev->pointNext = previous;
-			delete toDelete;
-		}
-		--_size;
-	}
+	Node<T>* toDelete = iter.value;
+	Node<T>* previous = toDelete->pointPrev;
+	previous->pointNext = toDelete->pointNext;
+	toDelete->pointNext->pointPrev = previous;
+	delete toDelete;
+	--_size;
 }
 
 
@@ -424,6 +380,11 @@ inline void List<T>::PopBack()
 {
 	if (_size == 0)
 	{
+		throw std::exception("List is empty");
+	}
+	if (this->_tail == nullptr)
+	{
+		PopFront();
 		return;
 	}
 	Node<T>* temp = _tail;
