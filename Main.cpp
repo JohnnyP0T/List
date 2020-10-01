@@ -194,4 +194,5 @@ int main()
 		}
 		system("cls");
 	}
+	delete list;
 }
