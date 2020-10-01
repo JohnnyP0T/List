@@ -1,7 +1,6 @@
-#include<iostream>
+#include <iostream>
 #include <list>
 #include <time.h> 
-#include <chrono>
 
 #include "windows.h"
 #include "List.h"
@@ -27,7 +26,7 @@ int GetElementConsole()
 }
 
 
-void PrintList(List<int>* list)
+void PrintList(List* list)
 {
 	for (auto i = list->begin(); i != list->end(); ++i)
 	{
@@ -38,14 +37,13 @@ void PrintList(List<int>* list)
 
 int main()
 {
-	List<int>* list = new List<int>;
-	long double seconds;
+	List* list = new List;
 	int count = 0;
-	int valueForPrint = 0;
+	bool valueForPrint = 0;
 	int valueForMenu = 0;
-	List<int>::ListIterator<int> it;
+	ListIterator it;
 	for (;;) {
-		if (valueForPrint == 7)
+		if (valueForPrint)
 		{
 			PrintList(list);
 			cout << endl;
@@ -62,10 +60,13 @@ int main()
 		cout << "8 - Insert \n";
 		cout << "9 - Remove \n";
 		cout << " =++=  0 - Exit  =++=" << endl;
+		cout << "Enter operation: ";
 		count = GetElementConsole();
+		cout << endl;
 		switch (count)
 		{
 		case 1:
+		{
 			try
 			{
 				list->PopBack();
@@ -76,7 +77,9 @@ int main()
 				system("pause");
 			}
 			break;
+		}
 		case 2:
+		{
 			try
 			{
 				list->PopFront();
@@ -87,19 +90,26 @@ int main()
 				system("pause");
 			}
 			break;
+		}
 		case 3: 
+		{
 			cout << "Enter integer value\n";
 			valueForMenu = GetElementConsole();
 			list->PushBack(valueForMenu);
 			break;
+		}
 		case 4:
+		{
 			cout << "Enter integer value\n";
 			valueForMenu = GetElementConsole();
 			list->PushFront(valueForMenu);
 			break;
+		}
 		case 5:
+		{
 			cout << "Enter integer value\n";
 			valueForMenu = GetElementConsole();
+
 			try
 			{
 				it = list->LinearSearch(valueForMenu);
@@ -110,9 +120,10 @@ int main()
 				system("pause");
 				break;
 			}
+
 			if (it != nullptr)
 			{
-				cout << "value " <<*(it) << " exist\n";
+				cout << "value " << *(it) << " exist\n";
 			}
 			else
 			{
@@ -120,13 +131,19 @@ int main()
 			}
 			system("pause");
 			break;
+		}
 		case 6:
+		{
 			list->Sort();
 			break;
+		}
 		case 7:
-			valueForPrint = 7;
+		{
+			valueForPrint = true;
 			break;
+		}
 		case 8:
+		{
 			cout << "Enter index\n";
 			valueForMenu = GetElementConsole();
 			if (valueForMenu > list->GetSize() || valueForMenu < 0)
@@ -137,58 +154,44 @@ int main()
 			}
 			cout << "Enter value\n";
 			count = GetElementConsole();
-			if (valueForMenu == 0)
-			{
-				list->PushFront(count);
-				break;
-			}
-			if (valueForMenu == list->GetSize())
-			{
-				list->PushBack(count);
-				break;
-			}
 			it = list->begin();
-			for (int i = 1; i < valueForMenu; i++)
+			for (int i = 0; i < valueForMenu; i++)
 			{
 				it++;
 			}
 			list->Insert(count, it);
 			break;
+		}
 		case 9:
+		{
 			cout << "Enter index\n";
 			valueForMenu = GetElementConsole();
-			if (valueForMenu > list->GetSize() || valueForMenu < 0)
+			if (valueForMenu >= list->GetSize() || valueForMenu < 0)
 			{
 				cout << "Out of range\n";
 				system("pause");
 				break;
 			}
-			if (valueForMenu == 0)
-			{
-				list->PopFront();
-				break;
-			}
-			if (valueForMenu == list->GetSize())
-			{
-				list->PopBack();
-				break;
-			}
 			it = list->begin();
-			it++;
-			for (int i = 2; i < valueForMenu; i++)
+			for (int i = 0; i < valueForMenu; i++)
 			{
 				it++;
 			}
 			list->RemoveAt(it);
 			break;
+		}
 		case 0:
+		{
 			return 0;
 			break;
+		}
 		default:
+		{
 			cout << "Invalid value\n";
 			system("pause");
 			break;
 		}
-		std::system("cls");
+		}
+		system("cls");
 	}
 }
