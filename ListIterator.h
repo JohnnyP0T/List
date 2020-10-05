@@ -7,11 +7,11 @@
 /// @brief итератор для листа
 class ListIterator
 {
-private:
+public:
 	Node* value;
 public:
-	friend class Node;
-	friend class List;
+	//friend class Node;
+	//friend class List;
 	/// @brief конструктор
 	ListIterator() : value(nullptr) {}
 
